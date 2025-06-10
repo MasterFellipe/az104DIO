@@ -192,11 +192,6 @@ Este documento reúne os principais aprendizados, anotações e a arquitetura do
 - **Bastion vs VPN**  
   Inicialmente planejado o uso do Azure Bastion para acesso remoto, porém devido ao custo elevado, foi adotada a solução OpenVPN no firewall para acesso seguro e eficiente.
 
----
-
-
----
-
 
 ---
 
