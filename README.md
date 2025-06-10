@@ -120,6 +120,83 @@ Regras definem quando escalar ↑ ou ↓
       ↓
 Criar/Remover instâncias VM automaticamente
 ```
+# Projeto de Ambiente Azure com NextCloud, OPNsense e Integração Entra ID
+
+Este documento reúne os principais aprendizados, anotações e a arquitetura do ambiente criado para proporcionar acesso seguro a arquivos via NextCloud, utilizando Azure Files, autenticação via Microsoft Entra ID e um firewall OPNsense.
+
+---
+
+## Arquitetura e Componentes
+
+- **VM 1: OPNsense**  
+  IP interno: `10.0.2.1`  
+  IP público: configurado para firewall, proxy reverso (HAProxy), e gerenciamento de certificados (ACME client).  
+  Controla o tráfego, segurança e VPN OpenVPN.
+
+- **VM 2: NextCloud**  
+  IP interno: `10.0.2.10`  
+  Aplicação NextCloud e banco de dados integrados.  
+  Acesso aos arquivos armazenados no Azure Files.
+
+- **Azure Files**  
+  Storage compartilhado para arquivos do NextCloud, acessado via SMB.
+
+- **Autenticação**  
+  Integração do NextCloud com Microsoft Entra ID (Azure AD) via protocolo SAML, usando registro de aplicativos para autenticação e autorização.
+
+- **Certificados SSL**  
+  Gerados no OPNsense usando ACME client e distribuídos via HAProxy para garantir HTTPS seguro.
+
+- **Acesso Remoto**  
+  Inicialmente considerado Azure Bastion para acesso RDP/SSH seguro às VMs, porém optou-se pelo OpenVPN devido ao custo.
+
+---
+
+## Rede, Acesso e Firewall
+
+| Origem             | Destino               | Porta          | Protocolo    | Função                                      |
+|--------------------|-----------------------|----------------|--------------|---------------------------------------------|
+| Usuário Externo    | OPNsense (IP público) | 443            | HTTPS (TCP)  | Acesso ao NextCloud via proxy reverso      |
+| OPNsense           | VM NextCloud (10.0.2.10) | 80, 443      | HTTP/HTTPS   | Comunicação interna NextCloud               |
+| VM NextCloud       | Azure Files           | 445            | SMB          | Acesso ao armazenamento de arquivos        |
+| Usuário/Admin      | Azure Bastion (IP público) | 443         | HTTPS (TCP)  | Acesso ao serviço Bastion (gerenciado Azure)|
+| Azure Bastion (IP interno) | VM NextCloud  | RDP/SSH | TCP          | Gerenciamento remoto seguro da VM           |
+| Usuário VPN        | VMs na VNet           | 3389 (RDP), 22 (SSH) | TCP    | Acesso remoto às VMs via OpenVPN            |
+| Usuário VPN        | OPNsense              | Porta OpenVPN (ex: 1194) | UDP/TCP  | Acesso VPN para a rede interna              |
+
+---
+
+## Notas Técnicas e Decisões
+
+- **Azure Bastion**  
+  Serviço gerenciado que permite acesso remoto seguro sem expor IP público das VMs.  
+  - Possui IP público gerenciado para acesso via portal Azure.  
+  - Recebe um IP privado fixo na VNet para conectar às VMs.  
+  - Custo cobrado por hora e transferência de dados.
+
+- **OpenVPN**  
+  Implantado no OPNsense para permitir acesso seguro à rede interna da VNet.  
+  - Usuários VPN acessam as VMs usando IP privado, com RDP/SSH.  
+  - Regras de firewall abertas para a porta do OpenVPN (ex: 1194 UDP/TCP).  
+  - Solução adotada para otimizar custo e manter segurança.
+
+- **Integração SAML com Microsoft Entra ID**  
+  Utiliza registro de aplicativos no Azure AD para permitir autenticação única (SSO) no NextCloud, garantindo controle de acesso centralizado.
+
+- **Certificados**  
+  Automação da geração e renovação via ACME client no OPNsense, garantindo segurança HTTPS com proxy reverso HAProxy.
+
+- **Azure Files**  
+  Armazenamento de arquivos para o NextCloud, acessado via protocolo SMB dentro da rede privada.
+
+- **Bastion vs VPN**  
+  Inicialmente planejado o uso do Azure Bastion para acesso remoto, porém devido ao custo elevado, foi adotada a solução OpenVPN no firewall para acesso seguro e eficiente.
+
+---
+
+
+---
+
 
 ---
 
