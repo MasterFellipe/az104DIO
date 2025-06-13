@@ -1,4 +1,3 @@
-
 # Certificação Microsoft Azure Administrator (AZ-104)
 
 Este documento reúne anotações baseadas nas questões e tópicos do exame AZ-104, voltado para administradores do Microsoft Azure. São conceitos práticos e teóricos essenciais para dominar a administração de ambientes Azure em empresas.
@@ -19,8 +18,8 @@ Este documento sintetiza os principais conceitos, práticas e respostas às ques
 - Autenticação multifator (MFA) e integração com apps SaaS.
 - Configuração de usuários convidados, permissões via RBAC e licenciamento.
 - Azure Bastion oferece acesso remoto seguro a VMs sem expor portas RDP/SSH.
-- Autenticação em VMs Linux via par de chaves SSH.
 - Desired State Configuration (DSC) para padronizar configurações em VMs Windows e Linux.
+- **Monitoramento de logins e falhas de autenticação** usando Azure AD Sign-in logs no Log Analytics.
 
 ---
 
@@ -29,6 +28,8 @@ Este documento sintetiza os principais conceitos, práticas e respostas às ques
 - Uso de Azure Policy para garantir conformidade e restrições.
 - Monitoramento com Azure Monitor e Security Center.
 - Controle de acesso privilegiado com Azure AD PIM.
+- **Service Health** para acompanhar a saúde dos serviços Microsoft e receber notificações de indisponibilidade.
+- **Alertas e Action Groups** configurados via Azure Monitor para violações de política.
 
 ---
 
@@ -37,6 +38,8 @@ Este documento sintetiza os principais conceitos, práticas e respostas às ques
 - Organização em grupos de recursos.
 - Implantação com ARM Templates, CLI e PowerShell.
 - Automação com Azure Automation e Logic Apps.
+- **Tags** para classificação e cobrança de recursos.
+- **Blueprints** para replicar padrões de governança.
 
 ---
 
@@ -45,6 +48,10 @@ Este documento sintetiza os principais conceitos, práticas e respostas às ques
 - Criação e configuração de Redes Virtuais (VNets), subnets e NSGs.
 - Configuração de VPN Gateway e ExpressRoute.
 - Balanceadores de carga: Azure Load Balancer e Application Gateway.
+- **Network Watcher**:
+  - Topologia de rede e IP Flow Verify.
+  - Captura de pacotes (“packet capture”) e connection troubleshoot.
+  - Logs de fluxo NSG analisados no Log Analytics.
 
 ---
 
@@ -52,6 +59,8 @@ Este documento sintetiza os principais conceitos, práticas e respostas às ques
 
 - VPN site-to-site para redes locais.
 - ExpressRoute para conexão privada dedicada.
+- **Point-to-Site VPN** para acesso de administradores.
+- Monitoramento de túneis VPN com Network Watcher e alertas.
 
 ---
 
@@ -59,17 +68,21 @@ Este documento sintetiza os principais conceitos, práticas e respostas às ques
 
 - Azure Traffic Manager para balanceamento global e failover.
 - Azure Front Door para CDN e segurança.
+- **Monitoramento de endpoints** configurado via probes e alertas de disponibilidade.
 
 ---
 
 ## 7. Administração do Armazenamento do Azure
 
-- Diferenças entre contas Standard e Premium (Premium não suporta replicação geográfica).
+- Diferenças entre contas Standard e Premium.
 - Uso de SAS Tokens para acesso temporário seguro.
 - Política de retenção de exclusão reversível para restaurar blobs.
 - Ferramenta recomendada para transferência de dados pequenos: AZCopy.
-- Protocolo para Azure Files: SMB 3.0.
-- Porta 445 deve estar liberada para acesso SMB.
+- Protocolo para Azure Files: SMB 3.0 (porta 445).
+- **Azure Backup Center** para unificar backups de VMs, arquivos e bases de dados.
+- **Snapshots**:
+  - Recuperação rápida sem restaurar backup completo.
+  - Impacto em custos e armazenamento dimensionado automaticamente.
 
 ---
 
@@ -78,126 +91,103 @@ Este documento sintetiza os principais conceitos, práticas e respostas às ques
 - Escolha de disco, tamanho e configuração conforme demanda.
 - Conjuntos de Disponibilidade (Availability Sets) para alta disponibilidade.
 - Virtual Machine Scale Sets (VMSS) para escalonamento automático horizontal.
-- Regras baseadas em métricas acionam escalonamento automático (CPU, memória).
-- Backup de VMs é responsabilidade do usuário.
-- Durante manutenção planejada, mover VMs conforme instruções para evitar downtime.
-- Configurações de rede padrão permitem tráfego de saída e restringem entrada.
-- Ambiente de produção usa alta disponibilidade e backup, diferente do teste.
+- Backup de VMs é responsabilidade do administrador.
+- **Instantâneos gerenciados** para recuperação pontual de discos.
+- **Agente MARS** para backup de máquinas físicas e VMs Linux/Windows no Recovery Services Vault.
+- **Propriedades obrigatórias**:
+  - Recovery Services Vault na mesma região da VM.
+  - Agente ou extensão habilitada para snapshots.
 
 ---
 
-## Anotações Extras
+## 9. Observabilidade e Monitoramento
 
-- Tempo de inatividade inesperado ocorre por falha não planejada.
-- Escalonamento vertical aumenta recursos de uma VM; horizontal adiciona mais VMs.
-- Uso de Azure Bastion elimina exposição direta de portas RDP/SSH.
-- Balanceadores de carga + Availability Sets reduzem impacto de falhas.
-- Autenticação em VMs Linux deve usar par de chaves SSH.
-- Backup das VMs deve ser configurado manualmente.
+- **Métricas vs Logs**  
+  - Métricas: dados numéricos de performance (CPU, disco, rede).  
+  - Logs: eventos descritivos, registros de atividade e erros.
+- **Log Analytics Workspace**  
+  - Repositório onde são agregados logs e métricas.  
+  - Coleta de dados de VMs, Storage, NSGs, Network Watcher e OPNsense.
+- **Kusto Query Language (KQL)**  
+  - Linguagem para consultar e correlacionar tabelas como `Heartbeat`, `Syslog`, `SecurityEvent`, `AzureDiagnostics`.
+- **Azure Monitor Insights**  
+  - Insights for VMs: mapeia dependências de processos, performance de SO e disco.  
+  - Network Insights: topologia, fluxos de tráfego e diagnósticos de VPN.
+- **Alertas e Action Groups**  
+  - Regras de alerta definem recurso, condição (limite de métrica ou query) e severidade.  
+  - Action Groups enviam notificações por e-mail, SMS ou acionam Logic Apps/Functions.
+- **Dashboards e Workbooks**  
+  - Dashboards personalizados no portal Azure para visão geral.  
+  - Workbooks interativos para relatórios de disponibilidade, utilização e incidentes.
 
 ---
 
-## Diagramas
-
-Modelo de Conjunto de Disponibilidade:
-```
-Rack 1: VM1, VM3
-Rack 2: VM2, VM4
-Falha em Rack 1 -> VMs no Rack 2 continuam ativas
-```
-
-Fluxo de Acesso Azure Bastion:
-```
-Usuário -> Portal Azure -> Azure Bastion -> VM (RDP/SSH)
-```
-Sem expor portas direto à internet.
-
-Escalonamento Automático (VMSS):
-```
-Métricas (CPU, Memória)
-      ↓
-Regras definem quando escalar ↑ ou ↓
-      ↓
-Criar/Remover instâncias VM automaticamente
-```
 # Projeto de Ambiente Azure com NextCloud, OPNsense e Integração Entra ID
 
-Este documento reúne os principais aprendizados, anotações e a arquitetura do ambiente criado para proporcionar acesso seguro a arquivos via NextCloud, utilizando Azure Files, autenticação via Microsoft Entra ID e um firewall OPNsense.
-
----
+Este ambiente oferece acesso seguro a arquivos via NextCloud, com firewall OPNsense e autenticação centralizada no Microsoft Entra ID.
 
 ## Arquitetura e Componentes
 
 - **VM 1: OPNsense**  
-  IP interno: `10.0.2.1`  
-  IP público: configurado para firewall, proxy reverso (HAProxy), e gerenciamento de certificados (ACME client).  
-  Controla o tráfego, segurança e VPN OpenVPN.
-
+  - IP interno: `10.0.2.1`  
+  - Firewall, HAProxy (proxy reverso), ACME client para certs, OpenVPN.
 - **VM 2: NextCloud**  
-  IP interno: `10.0.2.10`  
-  Aplicação NextCloud e banco de dados integrados.  
-  Acesso aos arquivos armazenados no Azure Files.
-
+  - IP interno: `10.0.2.10`  
+  - App NextCloud + banco de dados; arquivos em Azure Files (SMB).
 - **Azure Files**  
-  Storage compartilhado para arquivos do NextCloud, acessado via SMB.
-
+  - Storage para repositório de dados do NextCloud.
 - **Autenticação**  
-  Integração do NextCloud com Microsoft Entra ID (Azure AD) via protocolo SAML, usando registro de aplicativos para autenticação e autorização.
-
+  - SSO via SAML registrado no Microsoft Entra ID.
 - **Certificados SSL**  
-  Gerados no OPNsense usando ACME client e distribuídos via HAProxy para garantir HTTPS seguro.
-
+  - Gerados e renovados automaticamente no OPNsense.
 - **Acesso Remoto**  
-  Inicialmente considerado Azure Bastion para acesso RDP/SSH seguro às VMs, porém optou-se pelo OpenVPN devido ao custo.
-
----
+  - OpenVPN no OPNsense para RDP/SSH às VMs.
 
 ## Rede, Acesso e Firewall
 
-| Origem             | Destino               | Porta          | Protocolo    | Função                                      |
-|--------------------|-----------------------|----------------|--------------|---------------------------------------------|
-| Usuário Externo    | OPNsense (IP público) | 443            | HTTPS (TCP)  | Acesso ao NextCloud via proxy reverso      |
-| OPNsense           | VM NextCloud (10.0.2.10) | 80, 443      | HTTP/HTTPS   | Comunicação interna NextCloud               |
-| VM NextCloud       | Azure Files           | 445            | SMB          | Acesso ao armazenamento de arquivos        |
-| Usuário/Admin      | Azure Bastion (IP público) | 443         | HTTPS (TCP)  | Acesso ao serviço Bastion (gerenciado Azure)|
-| Azure Bastion (IP interno) | VM NextCloud  | RDP/SSH | TCP          | Gerenciamento remoto seguro da VM           |
-| Usuário VPN        | VMs na VNet           | 3389 (RDP), 22 (SSH) | TCP    | Acesso remoto às VMs via OpenVPN            |
-| Usuário VPN        | OPNsense              | Porta OpenVPN (ex: 1194) | UDP/TCP  | Acesso VPN para a rede interna              |
+| Origem           | Destino               | Porta   | Protocolo | Função                                |
+|------------------|-----------------------|---------|-----------|---------------------------------------|
+| Usuário Externo  | OPNsense (IP público) | 443     | HTTPS     | Acesso NextCloud via proxy reverso    |
+| OPNsense         | VM NextCloud          | 80, 443 | HTTP/HTTPS| Comunicação interna NextCloud         |
+| VM NextCloud     | Azure Files           | 445     | SMB       | Armazenamento de arquivos             |
+| Usuário VPN      | VMs na VNet           | 3389/22 | TCP       | Acesso remoto via OpenVPN             |
+| Network Watcher  | —                     | —       | —         | Monitoramento de rede habilitado      |
 
----
+## Monitoramento e Observabilidade no Projeto
 
-## Notas Técnicas e Decisões
+1. **Log Analytics Workspace**  
+   - Criado no mesmo RG e região do projeto.  
+   - Coleta dados de:  
+     - VMs (Heartbeat, Insights for VMs).  
+     - OPNsense (Syslog via agente ou coletor syslog).  
+     - Azure Files (AzureDiagnostics).  
+     - Network Watcher (NSG Flow Logs).
 
-- **Azure Bastion**  
-  Serviço gerenciado que permite acesso remoto seguro sem expor IP público das VMs.  
-  - Possui IP público gerenciado para acesso via portal Azure.  
-  - Recebe um IP privado fixo na VNet para conectar às VMs.  
-  - Custo cobrado por hora e transferência de dados.
+2. **Azure Monitor Insights**  
+   - **VM Insights**: habilita diagnóstico de CPU, disco, rede e dependências de processo para NextCloud e OPNsense.  
+   - **Network Insights**: visualiza topologia e falhas de conexão (IP Flow Verify, Connection Troubleshoot).
 
-- **OpenVPN**  
-  Implantado no OPNsense para permitir acesso seguro à rede interna da VNet.  
-  - Usuários VPN acessam as VMs usando IP privado, com RDP/SSH.  
-  - Regras de firewall abertas para a porta do OpenVPN (ex: 1194 UDP/TCP).  
-  - Solução adotada para otimizar custo e manter segurança.
+3. **Alertas e Action Groups**  
+   - Exemplo de alertas configurados:  
+     - **Disponibilidade NextCloud**: ping de heath probe falhando → severidade “Critical”.  
+     - **Uso de armazenamento**: quota Azure Files > 80% → severidade “Warning”.  
+     - **VPN Down**: monitorar saúde do túnel OpenVPN no OPNsense via syslog.  
+   - **Action Group** notifica administradores por e-mail e envia mensagem ao Teams.
 
-- **Integração SAML com Microsoft Entra ID**  
-  Utiliza registro de aplicativos no Azure AD para permitir autenticação única (SSO) no NextCloud, garantindo controle de acesso centralizado.
+4. **Dashboards e Workbooks**  
+   - **Dashboard “Ambiente NextCloud”**: widgets com CPU, memória e disco das VMs.  
+   - **Workbook “Saúde da Rede”**: consulta KQL para fluxos bloqueados (NSG flow logs) e IP Flow Verify.  
+   - **Workbook “Logs OPNsense”**: filtra erros de VPN, autenticações SAML e tráfego HTTP 5xx.
 
-- **Certificados**  
-  Automação da geração e renovação via ACME client no OPNsense, garantindo segurança HTTPS com proxy reverso HAProxy.
+5. **Consultas KQL de exemplo**  
+   ```kusto
+   // CPU médio das VMs última hora
+   InsightsMetrics
+   | where Namespace == "Processor" and Name == "PercentProcessorTime"
+   | summarize avg(Value) by Computer, bin(TimeGenerated, 1h)
 
-- **Azure Files**  
-  Armazenamento de arquivos para o NextCloud, acessado via protocolo SMB dentro da rede privada.
-
-- **Bastion vs VPN**  
-  Inicialmente planejado o uso do Azure Bastion para acesso remoto, porém devido ao custo elevado, foi adotada a solução OpenVPN no firewall para acesso seguro e eficiente.
-
-
----
-
-## Referências
-
-- [Microsoft AZ-104 Official Certification](https://learn.microsoft.com/pt-br/certifications/azure-administrator/)
-- Documentação oficial Microsoft Azure
-- Estudos e exercícios baseados em questões práticas do exame AZ-104
-
+   // Fluxos bloqueados por NSG no último dia
+   AzureDiagnostics
+   | where Category == "NetworkSecurityGroupFlowEvent" and FlowDirection_s == "I"
+   | where Action_s == "Deny"
+   | summarize count() by Resource_s, bin(TimeGenerated, 1h)
